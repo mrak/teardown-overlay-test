@@ -3,11 +3,10 @@
     <head>
     </head>
     <body>
+        <div id="teardown-setup-container"></div>
         <form id="my-form-id" action="/" method="get">
-            <div id="teardown-setup-container"></div>
-            <input name="bt_version" readonly>
+            <label for="bt_version">braintree.js version</label><input id="bt_version" name="bt_version" readonly>
             <div id="paypal-container"></div>
-            <input name="payment_method_nonce">
         </form>
 
         <script src="https://js.braintreegateway.com/js/braintree-2.24.1.min.js"></script>
@@ -16,16 +15,15 @@
             var myform = document.getElementById('my-form-id');
             var lifecycleContainer = document.getElementById('teardown-setup-container');
             var btVersionInput = myform['bt_version'];
-            var nonceInput = myform['bt_version'];
             var setupBtn = document.createElement('button');
             var teardownBtn = document.createElement('button');
 
             btVersionInput.value = braintree.VERSION;
 
-            setupBtn.innerHTML = 'setup';
+            setupBtn.innerHTML = 'setup braintree.js';
             setupBtn.addEventListener('click', setup);
 
-            teardownBtn.innerHTML = 'teardown';
+            teardownBtn.innerHTML = 'teardown braintree.js';
             teardownBtn.addEventListener('click', teardown);
 
             lifecycleContainer.appendChild(setupBtn);
@@ -36,7 +34,7 @@
                     return;
                 }
 
-                setupBtn.setAttribute('disabled');
+                setupBtn.setAttribute('disabled', 'disabled');
 
                 braintree.setup('sandbox_cq2s8rhd_mc7znnmhd2ywv7qv', 'custom', {
                     id: 'my-form-id',
@@ -49,6 +47,7 @@
                         lifecycleContainer.removeChild(setupBtn);
                         lifecycleContainer.appendChild(teardownBtn);
                     },
+                    onPaymentMethodReceived: function () {},
                     useCreditCard: false
                 });
             }
@@ -59,7 +58,7 @@
                     return;
                 }
 
-                teardownBtn.setAttribute('disabled');
+                teardownBtn.setAttribute('disabled', 'disabled');
 
                 btInstance.teardown(function () {
                     btInstance = null;

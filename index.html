@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+    <head>
+    </head>
+    <body>
+        <form id="my-form-id" action="/" method="get">
+            <div id="teardown-setup-container"></div>
+            <input name="bt_version" readonly>
+            <div id="paypal-container"></div>
+            <input name="payment_method_nonce">
+        </form>
+
+        <script src="https://js.braintreegateway.com/js/braintree-2.24.1.min.js"></script>
+        <script>
+            var btInstance;
+            var myform = document.getElementById('my-form-id');
+            var lifecycleContainer = document.getElementById('teardown-setup-container');
+            var btVersionInput = myform['bt_version'];
+            var nonceInput = myform['bt_version'];
+            var setupBtn = document.createElement('button');
+            var teardownBtn = document.createElement('button');
+
+            btVersionInput.value = braintree.VERSION;
+
+            setupBtn.innerHTML = 'setup';
+            setupBtn.addEventListener('click', setup);
+
+            teardownBtn.innerHTML = 'teardown';
+            teardownBtn.addEventListener('click', teardown);
+
+            lifecycleContainer.appendChild(setupBtn);
+
+            function setup () {
+                if (btInstance) {
+                    alert('braintree is already set up!');
+                    return;
+                }
+
+                setupBtn.setAttribute('disabled');
+
+                braintree.setup('sandbox_cq2s8rhd_mc7znnmhd2ywv7qv', 'custom', {
+                    id: 'my-form-id',
+                    paypal: {
+                        container: 'paypal-container'
+                    },
+                    onReady: function (bt) {
+                        btInstance = bt;
+                        setupBtn.removeAttribute('disabled');
+                        lifecycleContainer.removeChild(setupBtn);
+                        lifecycleContainer.appendChild(teardownBtn);
+                    },
+                    useCreditCard: false
+                });
+            }
+
+            function teardown () {
+                if (!btInstance) {
+                    alert('braintree is already torn down!');
+                    return;
+                }
+
+                teardownBtn.setAttribute('disabled');
+
+                btInstance.teardown(function () {
+                    btInstance = null;
+                    teardownBtn.removeAttribute('disabled');
+                    lifecycleContainer.removeChild(teardownBtn);
+                    lifecycleContainer.appendChild(setupBtn);
+                });
+            }
+        </script>
+    </body>
+</html>
